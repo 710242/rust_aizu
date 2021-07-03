@@ -1,6 +1,5 @@
 use std::io;
 
-#[derive(Clone)]
 pub struct Dice{
     // top,front,right,left,back,bottom
     // 1,2,3,4,5,6
@@ -54,12 +53,6 @@ impl Dice {
         self.swap(4, 2);
     }
 
-    fn rotate_west(&mut self){
-        self.swap(1, 2);
-        self.swap(2, 4);
-        self.swap(4, 3);
-    }
-
     fn check_same(&mut self,other:Dice) -> bool{
         //this way we can only determine three face
 
@@ -104,26 +97,20 @@ fn main(){
     let mut buffer2 = String::new();
 
     io::stdin().read_line(&mut buffer);
-    let mut times = buffer.trim().parse::<usize>().unwrap();
+    let mut dice1 : Vec<_> = buffer.trim().split_whitespace().map(|x| x.parse::<usize>().unwrap()).collect();
+    let mut dice1 = Dice::new(dice1[0], dice1[1], dice1[2], dice1[3], dice1[4], dice1[5]);
 
-    let mut dices :Vec<Dice> = vec![];
+    io::stdin().read_line(&mut buffer2);
+    let mut dice2 : Vec<_> = buffer2.trim().split_whitespace().map(|x| x.parse::<usize>().unwrap()).collect();
+    let mut dice2 = Dice::new(dice2[0], dice2[1], dice2[2], dice2[3], dice2[4], dice2[5]);
 
-    for i in (0..times){
-        io::stdin().read_line(&mut buffer2);
-        let mut dice : Vec<_> = buffer2.trim().split_whitespace().map(|x| x.parse::<usize>().unwrap()).collect();
-        let mut dice = Dice::new(dice[0], dice[1], dice[2], dice[3], dice[4], dice[5]);
-
-        dices.push(dice);
-        buffer2.clear();
-    }
-
-    for i in (0..dices.len()-1){
-        if dices[i].check_same(dices[i+1].clone()) == false {
+    match dice1.check_same(dice2) {
+        true => {
+            println!("Yes");
+        },
+        false => {
             println!("No");
-            break;
         }
     }
-
-    println!("Yes");
 
 }
