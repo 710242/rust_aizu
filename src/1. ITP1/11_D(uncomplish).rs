@@ -1,5 +1,6 @@
 use std::io;
 
+#[derive(Clone)]
 pub struct Dice{
     // top,front,right,left,back,bottom
     // 1,2,3,4,5,6
@@ -54,10 +55,25 @@ impl Dice {
     }
 
     fn check_same(&mut self,other:Dice) -> bool{
-        // this answer is wrong
-        // example:
-        // 1,2,3,4,5,6
-        // 1,2,3,4,5,7
+
+        // match (other.order[0],other.order[5]){
+        //     (a,b) if (a,b) == (self.order[1],self.order[4]) => {
+        //         self.rotate_front();
+        //     },
+        //     (a,b) if (a,b) == (self.order[2],self.order[3]) => {
+        //         self.rotate_left();
+        //     },
+        //     (a,b) if (a,b) == (self.order[3],self.order[2]) => {
+        //         self.rotate_right();
+        //     },
+        //     (a,b) if (a,b) == (self.order[4],self.order[1]) => {
+        //         self.rotate_back();
+        //     },
+        //     (a,b) if (a,b) == (self.order[5],self.order[0]) => {
+        //         self.rotate_bottom();
+        //     },
+        //     _ => {},
+        // }
 
         match other.order[0]{
             a if a == self.order[1] => {
@@ -80,7 +96,7 @@ impl Dice {
 
         let mut cnt = 0;
 
-        while !self.order[1..5].eq(&other.order[1..5]) {
+        while !self.order[1..6].eq(&other.order[1..6]) {
             if cnt > 5{
                 return false;
             }
@@ -91,7 +107,6 @@ impl Dice {
         return true;
 
     }
-
 }
 
 fn main(){
@@ -100,20 +115,42 @@ fn main(){
     let mut buffer2 = String::new();
 
     io::stdin().read_line(&mut buffer);
-    let mut dice1 : Vec<_> = buffer.trim().split_whitespace().map(|x| x.parse::<usize>().unwrap()).collect();
-    let mut dice1 = Dice::new(dice1[0], dice1[1], dice1[2], dice1[3], dice1[4], dice1[5]);
+    let mut times = buffer.trim().parse::<usize>().unwrap();
 
     io::stdin().read_line(&mut buffer2);
-    let mut dice2 : Vec<_> = buffer2.trim().split_whitespace().map(|x| x.parse::<usize>().unwrap()).collect();
-    let mut dice2 = Dice::new(dice2[0], dice2[1], dice2[2], dice2[3], dice2[4], dice2[5]);
+    let mut first_dice : Vec<_> = buffer2.trim().split_whitespace().map(|x| x.parse::<usize>().unwrap()).collect();
+    let mut first_dice = Dice::new(first_dice[0], first_dice[1], first_dice[2], first_dice[3], first_dice[4], first_dice[5]);
 
-    match dice1.check_same(dice2) {
-        true => {
-            println!("Yes");
-        },
-        false => {
-            println!("No");
+    let mut not_all_diff = false;
+
+    let mut dices : Vec<Dice> = vec![];
+
+    for i in (0..times-1){
+        buffer2.clear();
+        io::stdin().read_line(&mut buffer2);
+        let mut dice : Vec<_> = buffer2.trim().split_whitespace().map(|x| x.parse::<usize>().unwrap()).collect();
+        let mut dice = Dice::new(dice[0], dice[1], dice[2], dice[3], dice[4], dice[5]);
+
+        dices.push(dice);
+    }
+
+    while !dices.is_empty() {
+        for i in (0..dices.len()){
+            if first_dice.check_same(dices[i].clone()) == true{
+                not_all_diff = true;
+            }
         }
+        if not_all_diff == false {
+            first_dice = dices.pop().unwrap();
+        }else{
+            break;
+        }
+    }
+
+    if not_all_diff {
+        println!("No");
+    }else{
+        println!("Yes");
     }
 
 }
